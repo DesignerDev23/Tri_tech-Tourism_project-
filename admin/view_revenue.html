@@ -1,0 +1,83 @@
+<?php
+// Start the session
+session_start();
+
+// Check if the user is logged in as an admin
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../index.php");
+    exit();
+}
+
+// Your database connection code goes here
+$your_db_connection = mysqli_connect('localhost', 'root', '', 'tourism');
+
+// Fetch revenue data for all businesses from the database
+$query = "SELECT * FROM revenue";
+$result = mysqli_query($your_db_connection, $query);
+
+$data = array();
+while ($row = mysqli_fetch_assoc($result)) {
+    $data[] = $row;
+}
+
+// Close the database connection
+mysqli_close($your_db_connection);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Data</title>
+    <!-- Include jQuery and DataTables CSS/JS files -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+</head>
+<body>
+
+<!-- Display DataTable -->
+<table id="revenueTable" class="display">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Payment Reference</th>
+            <th>Created At</th>
+            <th>Amount Paid</th>
+            <th>Status</th>
+            <!-- Add other relevant columns as needed -->
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        foreach ($data as $record) {
+            echo "<tr>";
+            echo "<td>{$record['id']}</td>";
+            echo "<td>{$record['payment_reference']}</td>";
+            echo "<td>{$record['created_at']}</td>";
+            echo "<td>{$record['amount_paid']}</td>";
+            echo "<td>{$record['status']}</td>";
+            // Add other relevant columns as needed
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
+<!-- Display Total Amount Paid -->
+<div>Total Amount Paid: <span id="totalAmountPaid"></span></div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        var dataTable = $('#revenueTable').DataTable();
+
+        // Calculate and display total amount paid
+        var totalAmountPaid = <?php echo array_sum(array_column($data, 'amount_paid')); ?>;
+        $('#totalAmountPaid').text(totalAmountPaid.toFixed(2));
+    });
+</script>
+
+</body>
+</html>

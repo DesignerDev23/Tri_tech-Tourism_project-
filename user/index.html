@@ -1,0 +1,25 @@
+<?php
+// Include the user functions file
+include_once '../functions/user_functions.php';
+
+// Check if the user is logged in and is a user
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
+    header("Location: ../index.php");
+    exit();
+}
+
+// Your user dashboard content goes here
+
+echo "<h2>Welcome, {$_SESSION['username']}!</h2>";
+echo "<p>User Dashboard Content</p>";
+
+// Add links or buttons to other user functionalities
+
+echo "<a href='generate_invoice.php'>Generate Invoice</a>";
+echo "<a href='register_business.php'>Register Business</a>";
+echo "<a href='view_reports.php'>View Reports</a>";
+
+?>
+
+<!-- Your HTML content for the user dashboard goes here -->
